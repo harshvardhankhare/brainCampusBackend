@@ -243,12 +243,12 @@ Contributions, issues, and feature requests are welcome. Please fork the reposit
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the BrainCampus License.
 
 ---
 
 ## 👨‍💻 Author
 
-**Harsh Khare**
+**BrainCampus Team**
 
 BrainCampus is being developed as a modern SaaS platform to simplify and digitize school administration with a scalable, secure, and production-ready architecture.
