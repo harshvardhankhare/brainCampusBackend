@@ -1,0 +1,23 @@
+package com.braincampus.common.enums;
+public enum PermissionType {
+
+    CREATE_STUDENT,
+    UPDATE_STUDENT,
+    DELETE_STUDENT,
+    VIEW_STUDENT,
+
+    CREATE_TEACHER,
+    UPDATE_TEACHER,
+    DELETE_TEACHER,
+    VIEW_TEACHER,
+
+    CREATE_CLASS,
+    UPDATE_CLASS,
+    DELETE_CLASS,
+    VIEW_CLASS,
+
+    CREATE_SUBJECT,
+    UPDATE_SUBJECT,
+    DELETE_SUBJECT,
+    VIEW_SUBJECT
+}
