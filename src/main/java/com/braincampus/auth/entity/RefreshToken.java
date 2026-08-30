@@ -22,7 +22,7 @@ public class RefreshToken extends BaseEntity {
     @Builder.Default
     private Boolean revoked = false;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
