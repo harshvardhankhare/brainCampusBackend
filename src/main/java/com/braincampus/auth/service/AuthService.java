@@ -1,6 +1,5 @@
 package com.braincampus.auth.service;
-import com.braincampus.auth.dto.LoginRequest;
-import com.braincampus.auth.dto.LoginResponse;
+import com.braincampus.auth.dto.*;
 import com.braincampus.auth.entity.RefreshToken;
 import com.braincampus.auth.entity.User;
 import com.braincampus.auth.repository.RefreshTokenRepository;
@@ -13,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.braincampus.auth.dto.RegisterRequest;
-import com.braincampus.auth.dto.RegisterResponse;
 import com.braincampus.auth.entity.Permission;
 import com.braincampus.auth.entity.Role;
 import com.braincampus.auth.entity.Tenant;
@@ -41,7 +38,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
 
-    public LoginResponse login(LoginRequest request) {
+    public LoginResult login(LoginRequest request) {
 
         User user = userRepository
                 .findByEmailAndTenant_SchoolCode(
@@ -49,7 +46,9 @@ public class AuthService {
                         request.getSchoolCode()
                 )
                 .orElseThrow(() ->
-                        new UnauthorizedException("Invalid email, school code or password"));
+                        new UnauthorizedException(
+                                "Invalid email, school code or password"
+                        ));
 
         if (!user.getEnabled()) {
             throw new UnauthorizedException("User account is disabled");
@@ -63,7 +62,9 @@ public class AuthService {
                 request.getPassword(),
                 user.getPassword()
         )) {
-            throw new UnauthorizedException("Invalid email, school code or password");
+            throw new UnauthorizedException(
+                    "Invalid email, school code or password"
+            );
         }
 
         CustomUserDetails userDetails =
@@ -83,9 +84,8 @@ public class AuthService {
                         permission.getName().name())
                 .collect(Collectors.toSet());
 
-        return LoginResponse.builder()
+        LoginResponse response = LoginResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .userId(user.getId())
                 .fullName(buildFullName(user))
                 .email(user.getEmail())
@@ -93,13 +93,11 @@ public class AuthService {
                 .role(user.getRole().getName().name())
                 .permissions(permissions)
                 .build();
+
+        return new LoginResult(response, refreshToken);
     }
 
     private String createRefreshToken(User user) {
-
-        refreshTokenRepository
-                .findByUser(user)
-                .ifPresent(refreshTokenRepository::delete);
 
         String token = UUID.randomUUID().toString();
 

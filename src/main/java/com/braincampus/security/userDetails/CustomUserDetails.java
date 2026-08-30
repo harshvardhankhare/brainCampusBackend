@@ -84,4 +84,7 @@ public class CustomUserDetails implements UserDetails {
     public String getSchoolCode() {
         return user.getTenant().getSchoolCode();
     }
+    public String getRole() {
+        return user.getRole().getName().name();
+    }
 }

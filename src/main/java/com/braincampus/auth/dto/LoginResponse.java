@@ -1,6 +1,7 @@
 package com.braincampus.auth.dto;
 import lombok.Builder;
 import lombok.Data;
+
 import java.util.Set;
 
 @Data
@@ -8,8 +9,6 @@ import java.util.Set;
 public class LoginResponse {
 
     private String accessToken;
-
-    private String refreshToken;
 
     private Long userId;
 
