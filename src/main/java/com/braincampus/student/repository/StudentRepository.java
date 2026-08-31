@@ -1,7 +1,8 @@
 package com.braincampus.student.repository;
 import com.braincampus.student.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +24,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             String roleNumber,
             Long tenantId
     );
+    @Query("""
+        SELECT MAX(CAST(s.roleNumber AS integer))
+        FROM Student s
+        WHERE s.tenant.id = :tenantId
+        """)
+    Integer findMaxRoleNumberByTenantId(@Param("tenantId") Long tenantId);
 }
