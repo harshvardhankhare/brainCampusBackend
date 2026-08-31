@@ -3,6 +3,7 @@ import com.braincampus.auth.entity.Tenant;
 import com.braincampus.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import com.braincampus.schoolClass.entity.SchoolClass;
 
 import java.time.LocalDate;
 
@@ -57,4 +58,8 @@ public class Student extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tenant_id", nullable = false)
     private Tenant tenant;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "class_id", nullable = false)
+    private SchoolClass schoolClass;
 }
