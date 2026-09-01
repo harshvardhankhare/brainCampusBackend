@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface StudentFeeRepository
         extends JpaRepository<StudentFee, Long> {
 
+    List<StudentFee> findAllByTenantId(Long tenantId);
     List<StudentFee> findAllByTenantIdAndStudentId(
             Long tenantId,
             Long studentId
