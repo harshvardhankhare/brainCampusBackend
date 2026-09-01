@@ -1,5 +1,5 @@
 package com.braincampus.management.staff.entity;
-
+import com.braincampus.auth.entity.User;
 import com.braincampus.auth.entity.Tenant;
 import com.braincampus.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -65,4 +65,9 @@ public class Staff extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "tenant_id", nullable = false)
     private Tenant tenant;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
+
 }

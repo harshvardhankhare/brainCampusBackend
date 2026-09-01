@@ -1,5 +1,4 @@
 package com.braincampus.management.controller;
-
 import com.braincampus.common.dto.ApiResponse;
 import com.braincampus.management.dto.SalaryPaymentRequest;
 import com.braincampus.management.dto.SalaryPaymentResponse;
@@ -10,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -26,9 +24,7 @@ public class SalaryPaymentController {
             @Valid @RequestBody SalaryPaymentRequest request
     ) {
 
-        SalaryPaymentResponse response =
-                salaryPaymentService.create(request);
-
+        SalaryPaymentResponse response = salaryPaymentService.create(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
@@ -44,9 +40,7 @@ public class SalaryPaymentController {
     @PreAuthorize("hasAuthority('VIEW_SALARY_PAYMENT')")
     public ResponseEntity<ApiResponse<List<SalaryPaymentResponse>>> getAll() {
 
-        List<SalaryPaymentResponse> response =
-                salaryPaymentService.getAll();
-
+        List<SalaryPaymentResponse> response = salaryPaymentService.getAll();
         return ResponseEntity.ok(
                 ApiResponse.<List<SalaryPaymentResponse>>builder()
                         .success(true)
@@ -58,13 +52,9 @@ public class SalaryPaymentController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('VIEW_SALARY_PAYMENT')")
-    public ResponseEntity<ApiResponse<SalaryPaymentResponse>> getById(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<ApiResponse<SalaryPaymentResponse>> getById(@PathVariable Long id) {
 
-        SalaryPaymentResponse response =
-                salaryPaymentService.getById(id);
-
+        SalaryPaymentResponse response = salaryPaymentService.getById(id);
         return ResponseEntity.ok(
                 ApiResponse.<SalaryPaymentResponse>builder()
                         .success(true)
@@ -76,13 +66,9 @@ public class SalaryPaymentController {
 
     @GetMapping("/staff/{staffId}")
     @PreAuthorize("hasAuthority('VIEW_SALARY_PAYMENT')")
-    public ResponseEntity<ApiResponse<List<SalaryPaymentResponse>>> getByStaff(
-            @PathVariable Long staffId
-    ) {
+    public ResponseEntity<ApiResponse<List<SalaryPaymentResponse>>> getByStaff(@PathVariable Long staffId) {
 
-        List<SalaryPaymentResponse> response =
-                salaryPaymentService.getByStaff(staffId);
-
+        List<SalaryPaymentResponse> response = salaryPaymentService.getByStaff(staffId);
         return ResponseEntity.ok(
                 ApiResponse.<List<SalaryPaymentResponse>>builder()
                         .success(true)
@@ -99,12 +85,7 @@ public class SalaryPaymentController {
             @PathVariable Integer year
     ) {
 
-        List<SalaryPaymentResponse> response =
-                salaryPaymentService.getByMonth(
-                        month,
-                        year
-                );
-
+        List<SalaryPaymentResponse> response = salaryPaymentService.getByMonth(month, year);
         return ResponseEntity.ok(
                 ApiResponse.<List<SalaryPaymentResponse>>builder()
                         .success(true)
@@ -118,9 +99,7 @@ public class SalaryPaymentController {
     @PreAuthorize("hasAuthority('VIEW_SALARY_PAYMENT')")
     public ResponseEntity<ApiResponse<List<SalaryPaymentResponse>>> getPending() {
 
-        List<SalaryPaymentResponse> response =
-                salaryPaymentService.getPending();
-
+        List<SalaryPaymentResponse> response = salaryPaymentService.getPending();
         return ResponseEntity.ok(
                 ApiResponse.<List<SalaryPaymentResponse>>builder()
                         .success(true)
@@ -137,12 +116,7 @@ public class SalaryPaymentController {
             @Valid @RequestBody SalaryPaymentRequest request
     ) {
 
-        SalaryPaymentResponse response =
-                salaryPaymentService.update(
-                        id,
-                        request
-                );
-
+        SalaryPaymentResponse response = salaryPaymentService.update(id, request);
         return ResponseEntity.ok(
                 ApiResponse.<SalaryPaymentResponse>builder()
                         .success(true)
@@ -154,12 +128,9 @@ public class SalaryPaymentController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('DELETE_SALARY_PAYMENT')")
-    public ResponseEntity<ApiResponse<Void>> delete(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
 
         salaryPaymentService.delete(id);
-
         return ResponseEntity.ok(
                 ApiResponse.<Void>builder()
                         .success(true)

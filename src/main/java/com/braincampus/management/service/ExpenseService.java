@@ -9,7 +9,6 @@ import com.braincampus.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -21,9 +20,7 @@ public class ExpenseService {
 
     public ExpenseResponse create(ExpenseRequest request) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
+        Long tenantId = SecurityUtils.getCurrentTenantId();
         Expense expense = Expense.builder()
                 .category(request.getCategory())
                 .amount(request.getAmount())
@@ -40,16 +37,13 @@ public class ExpenseService {
                 .build();
 
         expense = expenseRepository.save(expense);
-
         return mapToResponse(expense);
     }
 
     @Transactional(readOnly = true)
     public List<ExpenseResponse> getAll() {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
+        Long tenantId = SecurityUtils.getCurrentTenantId();
         return expenseRepository
                 .findAllByTenantId(tenantId)
                 .stream()
@@ -61,33 +55,19 @@ public class ExpenseService {
     @Transactional(readOnly = true)
     public ExpenseResponse getById(Long id) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
-        Expense expense =
-                expenseRepository
-                        .findByIdAndTenantId(
-                                id,
-                                tenantId
-                        )
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+        Expense expense = expenseRepository
+                        .findByIdAndTenantId(id, tenantId)
                         .filter(e -> !e.getDeleted())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Expense not found"
-                                )
-                        );
+                        .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
 
         return mapToResponse(expense);
     }
 
     @Transactional(readOnly = true)
-    public List<ExpenseResponse> getByCategory(
-            String category
-    ) {
+    public List<ExpenseResponse> getByCategory(String category) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
+        Long tenantId = SecurityUtils.getCurrentTenantId();
         return expenseRepository
                 .findAllByTenantIdAndCategory(
                         tenantId,
@@ -106,14 +86,10 @@ public class ExpenseService {
     ) {
 
         if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException(
-                    "Start date cannot be after end date"
-            );
+            throw new IllegalArgumentException("Start date cannot be after end date");
         }
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
+        Long tenantId = SecurityUtils.getCurrentTenantId();
         return expenseRepository
                 .findAllByTenantIdAndExpenseDateBetween(
                         tenantId,
@@ -126,73 +102,30 @@ public class ExpenseService {
                 .toList();
     }
 
-    public ExpenseResponse update(
-            Long id,
-            ExpenseRequest request
-    ) {
+    public ExpenseResponse update(Long id, ExpenseRequest request) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
-        Expense expense =
-                expenseRepository
-                        .findByIdAndTenantId(
-                                id,
-                                tenantId
-                        )
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+        Expense expense = expenseRepository
+                        .findByIdAndTenantId(id, tenantId)
                         .filter(e -> !e.getDeleted())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Expense not found"
-                                )
-                        );
+                        .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
 
-        expense.setCategory(
-                request.getCategory()
-        );
-
-        expense.setAmount(
-                request.getAmount()
-        );
-
-        expense.setExpenseDate(
-                request.getExpenseDate()
-        );
-
-        expense.setDescription(
-                request.getDescription()
-        );
-
-        expense.setPaymentMethod(
-                request.getPaymentMethod()
-        );
-
-        expense.setReferenceNumber(
-                request.getReferenceNumber()
-        );
-
-        return mapToResponse(
-                expenseRepository.save(expense)
-        );
+        expense.setCategory(request.getCategory());
+        expense.setAmount(request.getAmount());
+        expense.setExpenseDate(request.getExpenseDate());
+        expense.setDescription(request.getDescription());
+        expense.setPaymentMethod(request.getPaymentMethod());
+        expense.setReferenceNumber(request.getReferenceNumber());
+        return mapToResponse(expenseRepository.save(expense));
     }
 
     public void delete(Long id) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
-        Expense expense =
-                expenseRepository
-                        .findByIdAndTenantId(
-                                id,
-                                tenantId
-                        )
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+        Expense expense = expenseRepository
+                        .findByIdAndTenantId(id, tenantId)
                         .filter(e -> !e.getDeleted())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Expense not found"
-                                )
-                        );
+                        .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
 
         expense.setDeleted(true);
 

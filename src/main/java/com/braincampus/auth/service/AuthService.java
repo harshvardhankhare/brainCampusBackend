@@ -1,9 +1,7 @@
 package com.braincampus.auth.service;
 import com.braincampus.auth.dto.*;
-import com.braincampus.auth.entity.RefreshToken;
-import com.braincampus.auth.entity.User;
-import com.braincampus.auth.repository.RefreshTokenRepository;
-import com.braincampus.auth.repository.UserRepository;
+import com.braincampus.auth.entity.*;
+import com.braincampus.auth.repository.*;
 import com.braincampus.exception.DuplicateResourceException;
 import com.braincampus.exception.UnauthorizedException;
 import com.braincampus.security.jwt.JwtService;
@@ -12,14 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.braincampus.auth.entity.Permission;
-import com.braincampus.auth.entity.Role;
-import com.braincampus.auth.entity.Tenant;
-import com.braincampus.auth.repository.PermissionRepository;
-import com.braincampus.auth.repository.RoleRepository;
-import com.braincampus.auth.repository.TenantRepository;
-import com.braincampus.common.enums.PermissionType;
 import com.braincampus.common.enums.RoleType;
+
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,18 +30,16 @@ public class AuthService {
     private final TenantRepository tenantRepository;
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private final PasswordResetOtpRepository passwordResetOtpRepository;
+    private final EmailService emailService;
 
     public LoginResult login(LoginRequest request) {
 
-        User user = userRepository
-                .findByEmailAndTenant_SchoolCode(
+        User user = userRepository.findByEmailAndTenant_SchoolCode(
                         request.getEmail(),
                         request.getSchoolCode()
                 )
-                .orElseThrow(() ->
-                        new UnauthorizedException(
-                                "Invalid email, school code or password"
-                        ));
+                .orElseThrow(() -> new UnauthorizedException("Invalid email, school code or password"));
 
         if (!user.getEnabled()) {
             throw new UnauthorizedException("User account is disabled");
@@ -215,5 +206,104 @@ public class AuthService {
                 .role(adminRole.getName().name())
                 .message("School and admin account registered successfully")
                 .build();
+    }
+    public void resetPassword(
+            ResetPasswordRequest request
+    ) {
+
+        User user = userRepository
+                .findByEmailAndTenant_SchoolCode(
+                        request.getEmail(),
+                        request.getSchoolCode()
+                )
+                .orElseThrow(() ->
+                        new UnauthorizedException(
+                                "Invalid reset request"
+                        )
+                );
+
+        PasswordResetOtp resetOtp = passwordResetOtpRepository
+                        .findTopByUserAndUsedFalseOrderByCreatedAtDesc(
+                                user
+                        )
+                        .orElseThrow(() ->
+                                new UnauthorizedException(
+                                        "Invalid or expired OTP"
+                                )
+                        );
+
+        if (resetOtp.getExpiryTime()
+                .isBefore(LocalDateTime.now())) {
+
+            throw new UnauthorizedException(
+                    "OTP has expired"
+            );
+        }
+
+        if (!resetOtp.getOtp()
+                .equals(request.getOtp())) {
+
+            throw new UnauthorizedException(
+                    "Invalid OTP"
+            );
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.getNewPassword()
+                )
+        );
+
+        resetOtp.setUsed(true);
+
+        userRepository.save(user);
+        passwordResetOtpRepository.save(resetOtp);
+    }
+    public void forgotPassword(ForgotPasswordRequest request) {
+
+        User user = userRepository
+                .findByEmailAndTenant_SchoolCode(
+                        request.getEmail(),
+                        request.getSchoolCode()
+                )
+                .orElse(null);
+
+        /*
+         * Don't reveal whether the account exists.
+         */
+        if (user == null) {
+            return;
+        }
+
+        // Invalidate previous unused OTP
+        passwordResetOtpRepository
+                .findTopByUserAndUsedFalseOrderByCreatedAtDesc(user)
+                .ifPresent(oldOtp -> {
+                    oldOtp.setUsed(true);
+                    passwordResetOtpRepository.save(oldOtp);
+                });
+
+        // Generate 6-digit OTP
+        String otp = String.format(
+                "%06d",
+                new SecureRandom().nextInt(1_000_000)
+        );
+
+        PasswordResetOtp passwordResetOtp =
+                PasswordResetOtp.builder()
+                        .user(user)
+                        .otp(otp)
+                        .expiryTime(
+                                LocalDateTime.now().plusMinutes(5)
+                        )
+                        .used(false)
+                        .build();
+
+        passwordResetOtpRepository.save(passwordResetOtp);
+
+        emailService.sendPasswordResetOtp(
+                user.getEmail(),
+                otp
+        );
     }
 }

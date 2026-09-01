@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -26,9 +25,7 @@ public class SalaryStructureController {
             @Valid @RequestBody SalaryStructureRequest request
     ) {
 
-        SalaryStructureResponse response =
-                salaryStructureService.create(request);
-
+        SalaryStructureResponse response = salaryStructureService.create(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
@@ -44,9 +41,7 @@ public class SalaryStructureController {
     @PreAuthorize("hasAuthority('VIEW_SALARY_STRUCTURE')")
     public ResponseEntity<ApiResponse<List<SalaryStructureResponse>>> getAll() {
 
-        List<SalaryStructureResponse> response =
-                salaryStructureService.getAll();
-
+        List<SalaryStructureResponse> response = salaryStructureService.getAll();
         return ResponseEntity.ok(
                 ApiResponse.<List<SalaryStructureResponse>>builder()
                         .success(true)
@@ -62,9 +57,7 @@ public class SalaryStructureController {
             @PathVariable Long id
     ) {
 
-        SalaryStructureResponse response =
-                salaryStructureService.getById(id);
-
+        SalaryStructureResponse response = salaryStructureService.getById(id);
         return ResponseEntity.ok(
                 ApiResponse.<SalaryStructureResponse>builder()
                         .success(true)
@@ -80,9 +73,7 @@ public class SalaryStructureController {
             @PathVariable Long staffId
     ) {
 
-        List<SalaryStructureResponse> response =
-                salaryStructureService.getByStaff(staffId);
-
+        List<SalaryStructureResponse> response = salaryStructureService.getByStaff(staffId);
         return ResponseEntity.ok(
                 ApiResponse.<List<SalaryStructureResponse>>builder()
                         .success(true)
@@ -98,9 +89,7 @@ public class SalaryStructureController {
             @PathVariable Long staffId
     ) {
 
-        SalaryStructureResponse response =
-                salaryStructureService.getCurrentSalary(staffId);
-
+        SalaryStructureResponse response = salaryStructureService.getCurrentSalary(staffId);
         return ResponseEntity.ok(
                 ApiResponse.<SalaryStructureResponse>builder()
                         .success(true)
@@ -117,9 +106,7 @@ public class SalaryStructureController {
             @Valid @RequestBody SalaryStructureRequest request
     ) {
 
-        SalaryStructureResponse response =
-                salaryStructureService.update(id, request);
-
+        SalaryStructureResponse response = salaryStructureService.update(id, request);
         return ResponseEntity.ok(
                 ApiResponse.<SalaryStructureResponse>builder()
                         .success(true)
@@ -131,12 +118,9 @@ public class SalaryStructureController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('DELETE_SALARY_STRUCTURE')")
-    public ResponseEntity<ApiResponse<Void>> delete(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
 
         salaryStructureService.delete(id);
-
         return ResponseEntity.ok(
                 ApiResponse.<Void>builder()
                         .success(true)

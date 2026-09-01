@@ -1,5 +1,6 @@
 package com.braincampus.management.staff.dto;
 
+import com.braincampus.common.enums.RoleType;
 import com.braincampus.management.staff.entity.StaffType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -43,4 +44,10 @@ public class StaffRequest {
 
     @Size(max = 500)
     private String address;
+
+    @NotNull
+    private RoleType role;
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    private String password;
 }
