@@ -1,4 +1,9 @@
 package com.braincampus.management.staff.service;
+import com.braincampus.auth.entity.Role;
+import com.braincampus.auth.entity.Tenant;
+import com.braincampus.auth.entity.User;
+import com.braincampus.auth.repository.RoleRepository;
+import com.braincampus.auth.repository.UserRepository;
 import com.braincampus.exception.DuplicateResourceException;
 import com.braincampus.exception.ResourceNotFoundException;
 import com.braincampus.security.SecurityUtils;
@@ -9,7 +14,7 @@ import com.braincampus.management.staff.repository.StaffRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 @Service
@@ -18,20 +23,58 @@ import java.util.List;
 public class StaffService {
 
     private final StaffRepository staffRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public StaffResponse create(StaffRequest request) {
 
         Long tenantId = SecurityUtils.getCurrentTenantId();
 
-        if (staffRepository.existsByEmployeeCodeAndTenantId(
-                request.getEmployeeCode(),
-                tenantId
-        )) {
+        // Check employee code
+        if (staffRepository.existsByEmployeeCodeAndTenantId(request.getEmployeeCode(), tenantId)) {
             throw new DuplicateResourceException(
                     "Employee code already exists"
             );
         }
 
+        // Check email for an existing user in this school
+        if (userRepository.existsByEmailAndTenant_Id(request.getEmail(), tenantId)) {
+            throw new DuplicateResourceException(
+                    "Email already exists"
+            );
+        }
+
+        // Find the fixed role
+        Role role = roleRepository.findByTenant_IdAndName(tenantId, request.getRole())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Role not found"
+                        )
+                );
+        Tenant tenant =
+                SecurityUtils.getCurrentUser()
+                        .getUser()
+                        .getTenant();
+
+        // Create login user
+        User user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .enabled(true)
+                .accountLocked(false)
+                .accountExpired(false)
+                .credentialsExpired(false)
+                .tenant(tenant)
+                .role(role)
+                .build();
+
+        user = userRepository.save(user);
+
+        // Create staff
         Staff staff = Staff.builder()
                 .employeeCode(request.getEmployeeCode())
                 .firstName(request.getFirstName())
@@ -44,11 +87,8 @@ public class StaffService {
                 .designation(request.getDesignation())
                 .address(request.getAddress())
                 .active(true)
-                .tenant(
-                        SecurityUtils.getCurrentUser()
-                                .getUser()
-                                .getTenant()
-                )
+                .tenant(tenant)
+                .user(user)
                 .build();
 
         staff = staffRepository.save(staff);
@@ -101,10 +141,7 @@ public class StaffService {
         return mapToResponse(staff);
     }
 
-    public StaffResponse update(
-            Long id,
-            StaffRequest request
-    ) {
+    public StaffResponse update(Long id, StaffRequest request) {
 
         Long tenantId = SecurityUtils.getCurrentTenantId();
 
@@ -157,11 +194,37 @@ public class StaffService {
                                 "Staff not found"
                         )
                 );
-
+        User user = staff.getUser();
+        if (user != null) {
+            user.setEnabled(false);
+        }
         staff.setDeleted(true);
         staff.setActive(false);
 
         staffRepository.save(staff);
+    }
+    public StaffResponse updateStatus(Long id, boolean active) {
+
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+
+        Staff staff = staffRepository
+                .findByIdAndTenantId(id, tenantId)
+                .filter(s -> !s.getDeleted())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Staff not found"
+                        )
+                );
+
+        staff.setActive(active);
+
+        if (staff.getUser() != null) {
+            staff.getUser().setEnabled(active);
+        }
+
+        staff = staffRepository.save(staff);
+
+        return mapToResponse(staff);
     }
 
     private StaffResponse mapToResponse(Staff staff) {

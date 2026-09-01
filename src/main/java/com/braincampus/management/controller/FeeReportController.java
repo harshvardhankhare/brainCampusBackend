@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,8 +26,7 @@ public class FeeReportController {
             @RequestParam(required = false) Integer month
     ) {
 
-        FeeReportSummaryResponse response =
-                feeReportService.getSummary(
+        FeeReportSummaryResponse response = feeReportService.getSummary(
                         academicYear,
                         classId,
                         month
@@ -51,13 +49,7 @@ public class FeeReportController {
             @RequestParam(required = false) Integer month
     ) {
 
-        List<FeeStudentReportResponse> response =
-                feeReportService.getStudentReport(
-                        academicYear,
-                        classId,
-                        month
-                );
-
+        List<FeeStudentReportResponse> response = feeReportService.getStudentReport(academicYear, classId, month);
         return ResponseEntity.ok(
                 ApiResponse.<List<FeeStudentReportResponse>>builder()
                         .success(true)
@@ -68,17 +60,9 @@ public class FeeReportController {
     }
     @GetMapping("/collection")
     @PreAuthorize("hasAuthority('VIEW_FEE_REPORT')")
-    public ResponseEntity<ApiResponse<FeeCollectionResponse>> getCollection(
-            @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate
-    ) {
+    public ResponseEntity<ApiResponse<FeeCollectionResponse>> getCollection(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
 
-        FeeCollectionResponse response =
-                feeReportService.getCollection(
-                        startDate,
-                        endDate
-                );
-
+        FeeCollectionResponse response = feeReportService.getCollection(startDate, endDate);
         return ResponseEntity.ok(
                 ApiResponse.<FeeCollectionResponse>builder()
                         .success(true)

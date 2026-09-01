@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,13 +21,9 @@ public class ExpenseController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('CREATE_EXPENSE')")
-    public ResponseEntity<ApiResponse<ExpenseResponse>> create(
-            @Valid @RequestBody ExpenseRequest request
-    ) {
+    public ResponseEntity<ApiResponse<ExpenseResponse>> create(@Valid @RequestBody ExpenseRequest request) {
 
-        ExpenseResponse response =
-                expenseService.create(request);
-
+        ExpenseResponse response = expenseService.create(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
@@ -44,9 +39,7 @@ public class ExpenseController {
     @PreAuthorize("hasAuthority('VIEW_EXPENSE')")
     public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getAll() {
 
-        List<ExpenseResponse> response =
-                expenseService.getAll();
-
+        List<ExpenseResponse> response = expenseService.getAll();
         return ResponseEntity.ok(
                 ApiResponse.<List<ExpenseResponse>>builder()
                         .success(true)
@@ -58,13 +51,9 @@ public class ExpenseController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('VIEW_EXPENSE')")
-    public ResponseEntity<ApiResponse<ExpenseResponse>> getById(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<ApiResponse<ExpenseResponse>> getById(@PathVariable Long id) {
 
-        ExpenseResponse response =
-                expenseService.getById(id);
-
+        ExpenseResponse response = expenseService.getById(id);
         return ResponseEntity.ok(
                 ApiResponse.<ExpenseResponse>builder()
                         .success(true)
@@ -76,13 +65,9 @@ public class ExpenseController {
 
     @GetMapping("/category/{category}")
     @PreAuthorize("hasAuthority('VIEW_EXPENSE')")
-    public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getByCategory(
-            @PathVariable String category
-    ) {
+    public ResponseEntity<ApiResponse<List<ExpenseResponse>>> getByCategory(@PathVariable String category) {
 
-        List<ExpenseResponse> response =
-                expenseService.getByCategory(category);
-
+        List<ExpenseResponse> response = expenseService.getByCategory(category);
         return ResponseEntity.ok(
                 ApiResponse.<List<ExpenseResponse>>builder()
                         .success(true)
@@ -99,12 +84,7 @@ public class ExpenseController {
             @RequestParam LocalDate endDate
     ) {
 
-        List<ExpenseResponse> response =
-                expenseService.getByDateRange(
-                        startDate,
-                        endDate
-                );
-
+        List<ExpenseResponse> response = expenseService.getByDateRange(startDate, endDate);
         return ResponseEntity.ok(
                 ApiResponse.<List<ExpenseResponse>>builder()
                         .success(true)
@@ -121,12 +101,7 @@ public class ExpenseController {
             @Valid @RequestBody ExpenseRequest request
     ) {
 
-        ExpenseResponse response =
-                expenseService.update(
-                        id,
-                        request
-                );
-
+        ExpenseResponse response = expenseService.update(id, request);
         return ResponseEntity.ok(
                 ApiResponse.<ExpenseResponse>builder()
                         .success(true)
@@ -138,12 +113,9 @@ public class ExpenseController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('DELETE_EXPENSE')")
-    public ResponseEntity<ApiResponse<Void>> delete(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
 
         expenseService.delete(id);
-
         return ResponseEntity.ok(
                 ApiResponse.<Void>builder()
                         .success(true)

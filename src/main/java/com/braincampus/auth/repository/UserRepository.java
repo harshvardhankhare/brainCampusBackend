@@ -1,5 +1,4 @@
 package com.braincampus.auth.repository;
-
 import com.braincampus.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;

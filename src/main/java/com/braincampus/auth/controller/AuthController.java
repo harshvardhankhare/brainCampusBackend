@@ -1,5 +1,8 @@
 package com.braincampus.auth.controller;
 import com.braincampus.auth.dto.*;
+import com.braincampus.auth.entity.PasswordResetOtp;
+import com.braincampus.auth.repository.PasswordResetOtpRepository;
+import com.braincampus.auth.repository.UserRepository;
 import com.braincampus.auth.service.AuthService;
 import com.braincampus.common.dto.ApiResponse;
 import jakarta.validation.Valid;
@@ -15,7 +18,9 @@ import com.braincampus.auth.entity.User;
 import com.braincampus.security.SecurityUtils;
 import com.braincampus.security.userDetails.CustomUserDetails;
 
+import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
@@ -23,6 +28,8 @@ import java.time.Duration;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
+    private final PasswordResetOtpRepository passwordResetOtpRepository;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
@@ -94,6 +101,21 @@ public class AuthController {
                         .success(true)
                         .message("User details fetched successfully")
                         .data(response)
+                        .build()
+        );
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request
+    ) {
+
+        authService.resetPassword(request);
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .message("Password reset successfully")
+                        .data(null)
                         .build()
         );
     }

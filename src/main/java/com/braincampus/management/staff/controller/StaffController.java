@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -23,13 +22,9 @@ public class StaffController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('CREATE_STAFF')")
-    public ResponseEntity<ApiResponse<StaffResponse>> create(
-            @Valid @RequestBody StaffRequest request
-    ) {
+    public ResponseEntity<ApiResponse<StaffResponse>> create(@Valid @RequestBody StaffRequest request) {
 
-        StaffResponse response =
-                staffService.create(request);
-
+        StaffResponse response = staffService.create(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
@@ -44,9 +39,7 @@ public class StaffController {
     @GetMapping
     @PreAuthorize("hasAuthority('VIEW_STAFF')")
     public ResponseEntity<ApiResponse<List<StaffResponse>>> getAll() {
-
-        List<StaffResponse> response =
-                staffService.getAll();
+        List<StaffResponse> response = staffService.getAll();
 
         return ResponseEntity.ok(
                 ApiResponse.<List<StaffResponse>>builder()
@@ -59,13 +52,9 @@ public class StaffController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('VIEW_STAFF')")
-    public ResponseEntity<ApiResponse<StaffResponse>> getById(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<ApiResponse<StaffResponse>> getById(@PathVariable Long id) {
 
-        StaffResponse response =
-                staffService.getById(id);
-
+        StaffResponse response = staffService.getById(id);
         return ResponseEntity.ok(
                 ApiResponse.<StaffResponse>builder()
                         .success(true)
@@ -77,13 +66,9 @@ public class StaffController {
 
     @GetMapping("/type/{type}")
     @PreAuthorize("hasAuthority('VIEW_STAFF')")
-    public ResponseEntity<ApiResponse<List<StaffResponse>>> getByType(
-            @PathVariable StaffType type
-    ) {
+    public ResponseEntity<ApiResponse<List<StaffResponse>>> getByType(@PathVariable StaffType type) {
 
-        List<StaffResponse> response =
-                staffService.getByType(type);
-
+        List<StaffResponse> response = staffService.getByType(type);
         return ResponseEntity.ok(
                 ApiResponse.<List<StaffResponse>>builder()
                         .success(true)
@@ -95,14 +80,9 @@ public class StaffController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('UPDATE_STAFF')")
-    public ResponseEntity<ApiResponse<StaffResponse>> update(
-            @PathVariable Long id,
-            @Valid @RequestBody StaffRequest request
-    ) {
+    public ResponseEntity<ApiResponse<StaffResponse>> update(@PathVariable Long id, @Valid @RequestBody StaffRequest request) {
 
-        StaffResponse response =
-                staffService.update(id, request);
-
+        StaffResponse response = staffService.update(id, request);
         return ResponseEntity.ok(
                 ApiResponse.<StaffResponse>builder()
                         .success(true)
@@ -114,17 +94,31 @@ public class StaffController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('DELETE_STAFF')")
-    public ResponseEntity<ApiResponse<Void>> delete(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
 
         staffService.delete(id);
-
         return ResponseEntity.ok(
                 ApiResponse.<Void>builder()
                         .success(true)
                         .message("Staff deleted successfully")
                         .data(null)
+                        .build()
+        );
+    }
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('UPDATE_STAFF')")
+    public ResponseEntity<ApiResponse<StaffResponse>> updateStatus(@PathVariable Long id, @RequestParam boolean active) {
+
+        StaffResponse response = staffService.updateStatus(id, active);
+        return ResponseEntity.ok(
+                ApiResponse.<StaffResponse>builder()
+                        .success(true)
+                        .message(
+                                active
+                                        ? "Staff activated successfully"
+                                        : "Staff deactivated successfully"
+                        )
+                        .data(response)
                         .build()
         );
     }
