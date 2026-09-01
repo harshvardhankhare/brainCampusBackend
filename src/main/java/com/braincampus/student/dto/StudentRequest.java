@@ -1,8 +1,5 @@
 package com.braincampus.student.dto;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -39,4 +36,7 @@ public class StudentRequest {
 
     @Size(max = 20, message = "Parent phone cannot exceed 20 characters")
     private String parentPhone;
+
+    @NotNull(message = "Class ID is required")
+    private Long classId;
 }
