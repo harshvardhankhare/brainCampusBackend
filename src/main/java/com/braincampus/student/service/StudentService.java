@@ -9,6 +9,8 @@ import com.braincampus.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.braincampus.schoolClass.entity.SchoolClass;
+import com.braincampus.schoolClass.repository.SchoolClassRepository;
 
 import java.util.List;
 
@@ -18,6 +20,7 @@ import java.util.List;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final SchoolClassRepository schoolClassRepository;
 
     public StudentResponse create(StudentRequest request) {
 
@@ -31,6 +34,17 @@ public class StudentService {
                     "Role number already exists"
             );
         }
+        SchoolClass schoolClass =
+                schoolClassRepository
+                        .findByIdAndTenantId(
+                                request.getClassId(),
+                                tenantId
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Class not found"
+                                )
+                        );
 
         Student student = new Student();
 
@@ -44,11 +58,7 @@ public class StudentService {
         student.setParentName(request.getParentName());
         student.setParentPhone(request.getParentPhone());
         student.setActive(true);
-
-        /*
-         * Tenant is obtained from the authenticated user.
-         * We do NOT accept tenantId from the frontend.
-         */
+        student.setSchoolClass(schoolClass);
         student.setTenant(
                 SecurityUtils.getCurrentUser().getUser().getTenant()
         );
@@ -109,6 +119,17 @@ public class StudentService {
                     "Role number already exists"
             );
         }
+        SchoolClass schoolClass =
+                schoolClassRepository
+                        .findByIdAndTenantId(
+                                request.getClassId(),
+                                tenantId
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Class not found"
+                                )
+                        );
 
         student.setRoleNumber(request.getRoleNumber());
         student.setFirstName(request.getFirstName());
@@ -119,7 +140,7 @@ public class StudentService {
         student.setAddress(request.getAddress());
         student.setParentName(request.getParentName());
         student.setParentPhone(request.getParentPhone());
-
+        student.setSchoolClass(schoolClass);
         student = studentRepository.save(student);
 
         return mapToResponse(student);
@@ -154,6 +175,10 @@ public class StudentService {
                 .parentPhone(student.getParentPhone())
                 .active(student.getActive())
                 .schoolCode(student.getTenant().getSchoolCode())
+                .classId(student.getSchoolClass().getId())
+                .className(student.getSchoolClass().getName())
+                .section(student.getSchoolClass().getSection())
+                .academicYear(student.getSchoolClass().getAcademicYear())
                 .build();
     }
 }

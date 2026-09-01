@@ -1,7 +1,6 @@
 package com.braincampus.student.dto;
 import lombok.Builder;
 import lombok.Data;
-
 import java.time.LocalDate;
 
 @Data
@@ -31,4 +30,12 @@ public class StudentResponse {
     private Boolean active;
 
     private String schoolCode;
+
+    private Long classId;
+
+    private String className;
+
+    private String section;
+
+    private String academicYear;
 }
