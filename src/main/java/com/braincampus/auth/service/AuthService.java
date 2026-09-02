@@ -306,4 +306,55 @@ public class AuthService {
                 otp
         );
     }
+    public LoginResult refresh(String refreshToken) {
+
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new RuntimeException("Refresh token is required");
+        }
+
+        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+
+        if (Boolean.TRUE.equals(token.getRevoked())) {
+            throw new RuntimeException("Refresh token has been revoked");
+        }
+
+        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Refresh token has expired");
+        }
+
+        User user = token.getUser();
+
+        if (!Boolean.TRUE.equals(user.getEnabled())) {
+            throw new RuntimeException("User account is disabled");
+        }
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
+        String accessToken = jwtService.generateAccessToken(userDetails);
+
+        String newRefreshToken = createRefreshToken(user);
+
+        // Rotate refresh token
+        token.setRevoked(true);
+        refreshTokenRepository.save(token);
+
+        LoginResponse response = LoginResponse.builder()
+                .accessToken(accessToken)
+                .userId(user.getId())
+                .fullName(user.getFirstName() +" "+ user.getLastName())
+                .email(user.getEmail())
+                .schoolCode(user.getTenant().getSchoolCode())
+                .role(user.getRole().getName().name())
+                .permissions(
+                        user.getRole()
+                                .getPermissions()
+                                .stream()
+                                .map(permission -> permission.getName().name())
+                                .collect(Collectors.toSet())
+                )
+                .build();
+
+        return new LoginResult(response, newRefreshToken);
+    }
 }

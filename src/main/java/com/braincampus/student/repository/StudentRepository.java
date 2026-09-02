@@ -30,4 +30,17 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
         WHERE s.tenant.id = :tenantId
         """)
     Integer findMaxRoleNumberByTenantId(@Param("tenantId") Long tenantId);
+
+    @Query("""
+    SELECT s
+    FROM Student s
+    WHERE s.tenant.id = :tenantId
+      AND s.schoolClass.id = :classId
+      AND s.schoolClass.academicYear = :academicYear
+    """)
+    List<Student> findAllByTenantIdAndClassIdAndAcademicYear(
+            @Param("tenantId") Long tenantId,
+            @Param("classId") Long classId,
+            @Param("academicYear") String academicYear
+    );
 }

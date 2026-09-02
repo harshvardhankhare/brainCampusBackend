@@ -69,13 +69,29 @@ public class StudentService {
     }
 
     @Transactional(readOnly = true)
-    public List<StudentResponse> getAll() {
+    public List<StudentResponse> getAll(
+            Long classId,
+            String academicYear
+    ) {
 
         Long tenantId = SecurityUtils.getCurrentTenantId();
 
-        return studentRepository
-                .findAllByTenantId(tenantId)
-                .stream()
+        List<Student> students;
+
+        if (classId != null && academicYear != null) {
+
+            students = studentRepository
+                    .findAllByTenantIdAndClassIdAndAcademicYear(
+                            tenantId,
+                            classId,
+                            academicYear
+                    );
+
+        } else {
+            students = studentRepository.findAllByTenantId(tenantId);
+        }
+
+        return students.stream()
                 .map(this::mapToResponse)
                 .toList();
     }

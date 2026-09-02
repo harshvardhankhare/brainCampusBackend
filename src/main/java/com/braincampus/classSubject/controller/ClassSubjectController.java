@@ -43,9 +43,7 @@ public class ClassSubjectController {
     @PreAuthorize("hasAuthority('VIEW_CLASS_SUBJECT')")
     public ResponseEntity<ApiResponse<List<ClassSubjectResponse>>> getAll() {
 
-        List<ClassSubjectResponse> response =
-                classSubjectService.getAll();
-
+        List<ClassSubjectResponse> response = classSubjectService.getAll();
         return ResponseEntity.ok(
                 ApiResponse.<List<ClassSubjectResponse>>builder()
                         .success(true)

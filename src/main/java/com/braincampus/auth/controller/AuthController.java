@@ -1,6 +1,5 @@
 package com.braincampus.auth.controller;
 import com.braincampus.auth.dto.*;
-import com.braincampus.auth.entity.PasswordResetOtp;
 import com.braincampus.auth.repository.PasswordResetOtpRepository;
 import com.braincampus.auth.repository.UserRepository;
 import com.braincampus.auth.service.AuthService;
@@ -17,10 +16,7 @@ import com.braincampus.auth.dto.UserResponse;
 import com.braincampus.auth.entity.User;
 import com.braincampus.security.SecurityUtils;
 import com.braincampus.security.userDetails.CustomUserDetails;
-
-import java.security.SecureRandom;
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
@@ -116,6 +112,41 @@ public class AuthController {
                         .success(true)
                         .message("Password reset successfully")
                         .data(null)
+                        .build()
+        );
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<LoginResponse>> refresh(
+            @CookieValue(name = "refreshToken", required = false)
+            String refreshToken,
+            HttpServletResponse response
+    ) {
+
+        LoginResult result = authService.refresh(refreshToken);
+
+        ResponseCookie refreshCookie =
+                ResponseCookie.from(
+                                "refreshToken",
+                                result.refreshToken()
+                        )
+                        .httpOnly(true)
+                        .secure(false) // true in production with HTTPS
+                        .sameSite("Lax")
+                        .path("/auth")
+                        .maxAge(Duration.ofDays(7))
+                        .build();
+
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                refreshCookie.toString()
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.<LoginResponse>builder()
+                        .success(true)
+                        .message("Token refreshed successfully")
+                        .data(result.response())
                         .build()
         );
     }
