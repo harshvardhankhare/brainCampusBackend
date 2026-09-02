@@ -41,11 +41,11 @@ public class StudentController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('VIEW_STUDENT')")
-    public ResponseEntity<ApiResponse<List<StudentResponse>>> getAll() {
-
-        List<StudentResponse> students =
-                studentService.getAll();
-
+    public ResponseEntity<ApiResponse<List<StudentResponse>>> getAll(
+            @RequestParam(required = false) Long classId,
+            @RequestParam(required = false) String academicYear
+    ) {
+        List<StudentResponse> students = studentService.getAll(classId, academicYear);
         return ResponseEntity.ok(
                 ApiResponse.<List<StudentResponse>>builder()
                         .success(true)

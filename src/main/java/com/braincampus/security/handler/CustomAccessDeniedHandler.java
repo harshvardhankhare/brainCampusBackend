@@ -10,12 +10,12 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class CustomAccessDeniedHandler
-        implements AccessDeniedHandler {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
 
@@ -28,13 +28,19 @@ public class CustomAccessDeniedHandler
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
 
-        Map<String, Object> body = Map.of(
-                "success", false,
-                "message", "You do not have permission to perform this action",
-                "data", null
+        Map<String, Object> body = new HashMap<>();
+        body.put("success", false);
+        body.put(
+                "message",
+                "You do not have permission to perform this action"
         );
+        body.put("data", null);
 
-        objectMapper.writeValue(response.getOutputStream(), body);
+        objectMapper.writeValue(
+                response.getOutputStream(),
+                body
+        );
     }
 }

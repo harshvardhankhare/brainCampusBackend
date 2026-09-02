@@ -41,7 +41,7 @@ public class AcademicYearController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('VIEW_ACADEMIC_YEAR')")
+   // @PreAuthorize("hasAuthority('VIEW_ACADEMIC_YEAR')")
     public ResponseEntity<ApiResponse<List<AcademicYearResponse>>> getAll() {
 
         List<AcademicYearResponse> response =
