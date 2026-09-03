@@ -57,4 +57,18 @@ public class RolePermissionController {
                         .build()
         );
     }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('MANAGE_ROLE_PERMISSIONS')")
+    public ResponseEntity<ApiResponse<List<RolePermissionResponse>>> getAllRoles() {
+
+        List<RolePermissionResponse> response = rolePermissionService.getAllRoles();
+        return ResponseEntity.ok(
+                ApiResponse.<List<RolePermissionResponse>>builder()
+                        .success(true)
+                        .message("Roles fetched successfully")
+                        .data(response)
+                        .build()
+        );
+    }
 }
