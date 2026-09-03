@@ -1,5 +1,4 @@
 package com.braincampus.exam.service;
-
 import com.braincampus.exam.dto.ReportCardResponse;
 import com.braincampus.exam.dto.ReportCardSubjectResponse;
 import com.braincampus.exam.entity.Exam;
@@ -13,7 +12,6 @@ import com.braincampus.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -32,19 +30,10 @@ public class ReportCardService {
             Long examId
     ) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
+        Long tenantId = SecurityUtils.getCurrentTenantId();
 
-        Student student =
-                studentRepository
-                        .findByIdAndTenantId(
-                                studentId,
-                                tenantId
-                        )
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Student not found"
-                                )
+        Student student = studentRepository.findByIdAndTenantId(studentId, tenantId).orElseThrow(() ->
+                        new ResourceNotFoundException("Student not found")
                         );
 
         Exam exam =
