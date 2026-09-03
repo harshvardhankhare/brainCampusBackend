@@ -1,6 +1,6 @@
 # BrainCampus Backend
 
-BrainCampus is a modern, scalable, multi-tenant School Management System built with Spring Boot. It is designed to manage the complete lifecycle of educational institutions, including student management, attendance, academics, examinations, fees, transport, hostel, communication, and administration.
+BrainCampus is a modern, scalable, multi School Management System built with Spring Boot. It is designed to manage the complete lifecycle of educational institutions, including student management, attendance, academics, examinations, fees, transport, hostel, communication, and administration.
 
 This repository contains the backend REST API for the BrainCampus platform.
 
