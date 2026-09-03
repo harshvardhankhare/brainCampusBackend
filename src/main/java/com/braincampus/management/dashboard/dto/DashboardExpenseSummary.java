@@ -1,8 +1,6 @@
 package com.braincampus.management.dashboard.dto;
-
 import lombok.Builder;
 import lombok.Getter;
-
 import java.math.BigDecimal;
 
 @Getter
