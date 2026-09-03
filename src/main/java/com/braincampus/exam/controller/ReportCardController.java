@@ -16,7 +16,7 @@ public class ReportCardController {
     private final ReportCardService reportCardService;
 
     @GetMapping("/student/{studentId}/exam/{examId}")
-    @PreAuthorize("hasAuthority('VIEW_REPORT_CARD')")
+   // @PreAuthorize("hasAuthority('VIEW_REPORT_CARD')")
     public ResponseEntity<ApiResponse<ReportCardResponse>> getReportCard(
             @PathVariable Long studentId,
             @PathVariable Long examId

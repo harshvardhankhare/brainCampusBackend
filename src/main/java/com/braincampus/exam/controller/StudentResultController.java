@@ -92,7 +92,7 @@ public class StudentResultController {
     }
 
     @GetMapping("/exam-subject/{examSubjectId}")
-    @PreAuthorize("hasAuthority('VIEW_STUDENT_RESULT')")
+   // @PreAuthorize("hasAuthority('VIEW_STUDENT_RESULT')")
     public ResponseEntity<ApiResponse<List<StudentResultResponse>>> getByExamSubject(
             @PathVariable Long examSubjectId
     ) {

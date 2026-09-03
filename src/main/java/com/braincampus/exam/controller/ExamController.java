@@ -40,7 +40,7 @@ public class ExamController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('VIEW_EXAM')")
+    //@PreAuthorize("hasAuthority('VIEW_EXAM')")
     public ResponseEntity<ApiResponse<List<ExamResponse>>> getAll() {
 
         List<ExamResponse> response =
@@ -56,7 +56,7 @@ public class ExamController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('VIEW_EXAM')")
+   // @PreAuthorize("hasAuthority('VIEW_EXAM')")
     public ResponseEntity<ApiResponse<ExamResponse>> getById(
             @PathVariable Long id
     ) {
@@ -74,7 +74,7 @@ public class ExamController {
     }
 
     @GetMapping("/class/{classId}")
-    @PreAuthorize("hasAuthority('VIEW_EXAM')")
+   // @PreAuthorize("hasAuthority('VIEW_EXAM')")
     public ResponseEntity<ApiResponse<List<ExamResponse>>> getByClass(
             @PathVariable Long classId
     ) {
