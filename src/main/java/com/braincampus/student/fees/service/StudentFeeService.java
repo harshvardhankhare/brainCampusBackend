@@ -1,8 +1,12 @@
 package com.braincampus.student.fees.service;
 import com.braincampus.exception.DuplicateResourceException;
 import com.braincampus.exception.ResourceNotFoundException;
+import com.braincampus.schoolClass.entity.SchoolClass;
+import com.braincampus.schoolClass.repository.SchoolClassRepository;
 import com.braincampus.security.SecurityUtils;
 import com.braincampus.student.entity.Student;
+import com.braincampus.student.fees.dto.ClassFeeRequest;
+import com.braincampus.student.fees.dto.ClassFeeResponse;
 import com.braincampus.student.fees.dto.StudentFeeRequest;
 import com.braincampus.student.fees.dto.StudentFeeResponse;
 import com.braincampus.student.fees.entity.StudentFee;
@@ -15,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +31,7 @@ public class StudentFeeService {
     private final StudentFeeRepository feeRepository;
     private final FeePaymentRepository paymentRepository;
     private final StudentRepository studentRepository;
+    private final SchoolClassRepository schoolClassRepository;
 
     public StudentFeeResponse create(StudentFeeRequest request) {
 
@@ -70,6 +78,118 @@ public class StudentFeeService {
         fee = feeRepository.save(fee);
 
         return mapToResponse(fee);
+    }
+
+    public ClassFeeResponse createForClass(ClassFeeRequest request) {
+
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+
+        SchoolClass schoolClass = schoolClassRepository
+                .findByIdAndTenantId(request.getClassId(), tenantId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Class not found")
+                );
+
+        String academicYear = (request.getAcademicYear() != null && !request.getAcademicYear().isBlank())
+                ? request.getAcademicYear().trim()
+                : schoolClass.getAcademicYear();
+
+        List<Student> students = studentRepository
+                .findAllActiveByTenantIdAndClassId(tenantId, schoolClass.getId());
+
+        if (students.isEmpty()) {
+            throw new ResourceNotFoundException("No active students found in this class");
+        }
+
+        // Find existing fees for this class and academic year
+        List<StudentFee> existingFees = feeRepository
+                .findAllByTenantIdAndAcademicYearAndClassId(
+                        tenantId,
+                        academicYear,
+                        schoolClass.getId()
+                );
+
+        Set<Long> studentIdsWithFee = existingFees.stream()
+                .filter(fee -> !Boolean.TRUE.equals(fee.getDeleted())
+                        && fee.getFeeType() == request.getFeeType()
+                        && Objects.equals(fee.getFeeMonth(), request.getFeeMonth()))
+                .map(fee -> fee.getStudent().getId())
+                .collect(Collectors.toSet());
+
+        List<Student> eligibleStudents = students.stream()
+                .filter(student -> !studentIdsWithFee.contains(student.getId()))
+                .toList();
+
+        if (eligibleStudents.isEmpty()) {
+            throw new DuplicateResourceException(
+                    "Fee already exists for all students in this class for the specified period"
+            );
+        }
+
+        List<StudentFee> newFees = eligibleStudents.stream()
+                .map(student -> StudentFee.builder()
+                        .tenant(student.getTenant())
+                        .student(student)
+                        .academicYear(academicYear)
+                        .feeType(request.getFeeType())
+                        .feeMonth(request.getFeeMonth())
+                        .amount(request.getAmount())
+                        .dueDate(request.getDueDate())
+                        .description(request.getDescription())
+                        .build())
+                .toList();
+
+        List<StudentFee> savedFees = feeRepository.saveAll(newFees);
+
+        List<StudentFeeResponse> feeResponses = savedFees.stream()
+                .map(this::mapToResponse)
+                .toList();
+
+        int skippedCount = students.size() - eligibleStudents.size();
+
+        return ClassFeeResponse.builder()
+                .classId(schoolClass.getId())
+                .className(schoolClass.getName())
+                .section(schoolClass.getSection())
+                .academicYear(academicYear)
+                .feeType(request.getFeeType())
+                .feeMonth(request.getFeeMonth())
+                .amount(request.getAmount())
+                .totalStudents(students.size())
+                .feesCreated(feeResponses.size())
+                .feesSkipped(skippedCount)
+                .fees(feeResponses)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<StudentFeeResponse> getFeesByClass(
+            Long classId,
+            String academicYear
+    ) {
+
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+
+        SchoolClass schoolClass = schoolClassRepository
+                .findByIdAndTenantId(classId, tenantId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Class not found")
+                );
+
+        String year = (academicYear != null && !academicYear.isBlank())
+                ? academicYear.trim()
+                : schoolClass.getAcademicYear();
+
+        return feeRepository
+                .findAllByTenantIdAndAcademicYearAndClassId(
+                        tenantId,
+                        year,
+                        schoolClass.getId()
+                )
+                .stream()
+                .filter(fee -> !Boolean.TRUE.equals(fee.getDeleted()))
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Transactional(readOnly = true)

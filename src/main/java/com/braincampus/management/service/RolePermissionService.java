@@ -106,4 +106,43 @@ public class RolePermissionService {
                 )
                 .toList();
     }
+
+    public List<RolePermissionResponse> getAllRoles() {
+
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+        com.braincampus.auth.entity.Tenant tenant =
+                SecurityUtils.getCurrentUser().getUser().getTenant();
+
+        // Ensure standard customizable roles exist for this tenant
+        List<com.braincampus.common.enums.RoleType> standardRoles = List.of(
+                com.braincampus.common.enums.RoleType.TEACHER,
+                com.braincampus.common.enums.RoleType.ACCOUNTANT,
+                com.braincampus.common.enums.RoleType.LIBRARIAN
+        );
+
+        for (com.braincampus.common.enums.RoleType roleType : standardRoles) {
+            if (roleRepository.findByTenant_IdAndName(tenantId, roleType).isEmpty()) {
+                Role newRole = Role.builder()
+                        .name(roleType)
+                        .description(roleType.name() + " Role")
+                        .tenant(tenant)
+                        .permissions(new HashSet<>())
+                        .build();
+                roleRepository.save(newRole);
+            }
+        }
+
+        return roleRepository.findAllByTenantId(tenantId)
+                .stream()
+                .filter(role -> !Boolean.TRUE.equals(role.getDeleted()))
+                .map(role -> RolePermissionResponse.builder()
+                        .roleId(role.getId())
+                        .role(role.getName().name())
+                        .permissions(role.getPermissions()
+                                .stream()
+                                .map(Permission::getName)
+                                .collect(Collectors.toSet()))
+                        .build())
+                .toList();
+    }
 }

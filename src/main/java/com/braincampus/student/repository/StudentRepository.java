@@ -43,4 +43,17 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             @Param("classId") Long classId,
             @Param("academicYear") String academicYear
     );
+
+    @Query("""
+    SELECT s
+    FROM Student s
+    WHERE s.tenant.id = :tenantId
+      AND s.schoolClass.id = :classId
+      AND (s.deleted = false OR s.deleted IS NULL)
+      AND (s.active = true OR s.active IS NULL)
+    """)
+    List<Student> findAllActiveByTenantIdAndClassId(
+            @Param("tenantId") Long tenantId,
+            @Param("classId") Long classId
+    );
 }

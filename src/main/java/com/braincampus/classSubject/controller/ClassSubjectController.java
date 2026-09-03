@@ -40,7 +40,7 @@ public class ClassSubjectController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('VIEW_CLASS_SUBJECT')")
+   // @PreAuthorize("hasAuthority('VIEW_CLASS_SUBJECT')")
     public ResponseEntity<ApiResponse<List<ClassSubjectResponse>>> getAll() {
 
         List<ClassSubjectResponse> response = classSubjectService.getAll();
