@@ -11,21 +11,11 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    public void sendPasswordResetOtp(
-            String email,
-            String otp
-    ) {
-
-        SimpleMailMessage message =
-                new SimpleMailMessage();
-
+    public void sendPasswordResetOtp(String email, String otp) {
+        SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
-        message.setSubject(
-                "BrainCampus Password Reset OTP"
-        );
-
-        message.setText(
-                "Your BrainCampus password reset OTP is: "
+        message.setSubject("BrainCampus Password Reset OTP");
+        message.setText("Your BrainCampus password reset OTP is: "
                         + otp
                         + "\n\n"
                         + "This OTP is valid for 5 minutes."
