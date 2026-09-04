@@ -55,7 +55,7 @@ class StudentServiceTest {
 
         tenant = Tenant.builder()
                 .schoolCode("SCH001")
-                .name("Test School")
+                .schoolName("Test School")
                 .build();
         tenant.setId(tenantId);
 
