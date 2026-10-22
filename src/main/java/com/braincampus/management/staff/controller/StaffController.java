@@ -1,5 +1,4 @@
 package com.braincampus.management.staff.controller;
-
 import com.braincampus.common.dto.ApiResponse;
 import com.braincampus.management.staff.dto.StaffRequest;
 import com.braincampus.management.staff.dto.StaffResponse;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
 @RestController
 @RequestMapping("/staff")
 @RequiredArgsConstructor

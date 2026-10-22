@@ -2,18 +2,18 @@ package com.braincampus.student.service;
 import com.braincampus.exception.DuplicateResourceException;
 import com.braincampus.exception.ResourceNotFoundException;
 import com.braincampus.security.SecurityUtils;
+import com.braincampus.student.dto.PageResponse;
 import com.braincampus.student.dto.StudentRequest;
 import com.braincampus.student.dto.StudentResponse;
 import com.braincampus.student.entity.Student;
 import com.braincampus.student.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.braincampus.schoolClass.entity.SchoolClass;
 import com.braincampus.schoolClass.repository.SchoolClassRepository;
-
-import java.util.List;
-
+import org.springframework.data.domain.Pageable;
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -69,31 +69,50 @@ public class StudentService {
     }
 
     @Transactional(readOnly = true)
-    public List<StudentResponse> getAll(
+    public PageResponse<StudentResponse> getAll(
             Long classId,
-            String academicYear
+            String academicYear,
+            Pageable pageable
     ) {
-
         Long tenantId = SecurityUtils.getCurrentTenantId();
 
-        List<Student> students;
+        Page<Student> studentPage;
 
-        if (classId != null && academicYear != null) {
-
-            students = studentRepository
-                    .findAllByTenantIdAndClassIdAndAcademicYear(
-                            tenantId,
-                            classId,
-                            academicYear
-                    );
-
+        if (classId != null || academicYear != null) {
+            studentPage = studentRepository.findStudentsWithFilter(
+                    tenantId,
+                    classId,
+                    academicYear,
+                    pageable
+            );
         } else {
-            students = studentRepository.findAllByTenantId(tenantId);
+            studentPage = studentRepository.findAllByTenantId(tenantId, pageable);
         }
 
-        return students.stream()
-                .map(this::mapToResponse)
-                .toList();
+        Page<StudentResponse> responsePage = studentPage.map(this::mapToResponse);
+
+        return PageResponse.from(responsePage);
+    }
+
+    private StudentResponse mapToResponse(Student student) {
+        return StudentResponse.builder()
+                .id(student.getId())
+                .roleNumber(student.getRoleNumber())
+                .firstName(student.getFirstName())
+                .lastName(student.getLastName())
+                .email(student.getEmail())
+                .phone(student.getPhone())
+                .dateOfBirth(student.getDateOfBirth())
+                .address(student.getAddress())
+                .parentName(student.getParentName())
+                .parentPhone(student.getParentPhone())
+                .active(student.getActive())
+                .schoolCode(student.getTenant().getSchoolCode())
+                .classId(student.getSchoolClass().getId())
+                .className(student.getSchoolClass().getName())
+                .section(student.getSchoolClass().getSection())
+                .academicYear(student.getSchoolClass().getAcademicYear())
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -174,27 +193,5 @@ public class StudentService {
                         ));
 
         studentRepository.delete(student);
-    }
-
-    private StudentResponse mapToResponse(Student student) {
-
-        return StudentResponse.builder()
-                .id(student.getId())
-                .roleNumber(student.getRoleNumber())
-                .firstName(student.getFirstName())
-                .lastName(student.getLastName())
-                .email(student.getEmail())
-                .phone(student.getPhone())
-                .dateOfBirth(student.getDateOfBirth())
-                .address(student.getAddress())
-                .parentName(student.getParentName())
-                .parentPhone(student.getParentPhone())
-                .active(student.getActive())
-                .schoolCode(student.getTenant().getSchoolCode())
-                .classId(student.getSchoolClass().getId())
-                .className(student.getSchoolClass().getName())
-                .section(student.getSchoolClass().getSection())
-                .academicYear(student.getSchoolClass().getAcademicYear())
-                .build();
     }
 }

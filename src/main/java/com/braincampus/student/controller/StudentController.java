@@ -1,16 +1,18 @@
 package com.braincampus.student.controller;
 import com.braincampus.common.dto.ApiResponse;
+import com.braincampus.student.dto.PageResponse;
 import com.braincampus.student.dto.StudentRequest;
 import com.braincampus.student.dto.StudentResponse;
 import com.braincampus.student.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/students")
@@ -41,13 +43,15 @@ public class StudentController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('VIEW_STUDENT')")
-    public ResponseEntity<ApiResponse<List<StudentResponse>>> getAll(
+    public ResponseEntity<ApiResponse<PageResponse<StudentResponse>>> getAll(
             @RequestParam(required = false) Long classId,
-            @RequestParam(required = false) String academicYear
+            @RequestParam(required = false) String academicYear,
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        List<StudentResponse> students = studentService.getAll(classId, academicYear);
+        PageResponse<StudentResponse> students = studentService.getAll(classId, academicYear, pageable);
+
         return ResponseEntity.ok(
-                ApiResponse.<List<StudentResponse>>builder()
+                ApiResponse.<PageResponse<StudentResponse>>builder()
                         .success(true)
                         .message("Students fetched successfully")
                         .data(students)

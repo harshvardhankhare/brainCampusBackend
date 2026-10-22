@@ -1,5 +1,4 @@
 package com.braincampus.management.service;
-
 import com.braincampus.exception.ResourceNotFoundException;
 import com.braincampus.management.dto.ExpenseRequest;
 import com.braincampus.management.dto.ExpenseResponse;
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -143,9 +141,7 @@ public class ExpenseService {
                 .expenseDate(expense.getExpenseDate())
                 .description(expense.getDescription())
                 .paymentMethod(expense.getPaymentMethod())
-                .referenceNumber(
-                        expense.getReferenceNumber()
-                )
+                .referenceNumber(expense.getReferenceNumber())
                 .build();
     }
 }
