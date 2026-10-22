@@ -1,5 +1,4 @@
 package com.braincampus.management.staff.dto;
-
 import com.braincampus.common.enums.RoleType;
 import com.braincampus.management.staff.entity.StaffType;
 import jakarta.validation.constraints.NotBlank;

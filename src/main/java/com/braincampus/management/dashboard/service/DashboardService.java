@@ -1,5 +1,4 @@
 package com.braincampus.management.dashboard.service;
-
 import com.braincampus.management.dashboard.dto.DashboardExpenseSummary;
 import com.braincampus.management.dashboard.dto.DashboardFeeSummary;
 import com.braincampus.management.dashboard.dto.DashboardResponse;
@@ -49,23 +48,13 @@ public class DashboardService {
             );
         }
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
-        // =========================
-        // STUDENTS
-        // =========================
-
+        Long tenantId = SecurityUtils.getCurrentTenantId();
         long totalStudents =
                 studentRepository
                         .findAllByTenantId(tenantId)
                         .stream()
                         .filter(s -> !s.getDeleted())
                         .count();
-
-        // =========================
-        // STAFF
-        // =========================
 
         long totalStaff =
                 staffRepository

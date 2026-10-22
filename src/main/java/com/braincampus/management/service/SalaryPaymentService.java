@@ -1,5 +1,4 @@
 package com.braincampus.management.service;
-
 import com.braincampus.exception.DuplicateResourceException;
 import com.braincampus.exception.ResourceNotFoundException;
 import com.braincampus.management.dto.SalaryPaymentRequest;
@@ -7,17 +6,14 @@ import com.braincampus.management.dto.SalaryPaymentResponse;
 import com.braincampus.management.entity.SalaryPayment;
 import com.braincampus.management.repository.SalaryPaymentRepository;
 import com.braincampus.management.repository.SalaryStructureRepository;
-import com.braincampus.management.entity.SalaryStructure;
 import com.braincampus.management.staff.entity.Staff;
 import com.braincampus.management.staff.repository.StaffRepository;
 import com.braincampus.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,11 +27,8 @@ public class SalaryPaymentService {
             SalaryPaymentRequest request
     ) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
-        Staff staff =
-                staffRepository
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+        Staff staff = staffRepository
                         .findByIdAndTenantId(
                                 request.getStaffId(),
                                 tenantId
@@ -55,15 +48,10 @@ public class SalaryPaymentService {
                         tenantId
                 )) {
 
-            throw new DuplicateResourceException(
-                    "Salary payment already exists for this staff member and month"
-            );
+            throw new DuplicateResourceException("Salary payment already exists for this staff member and month");
         }
 
-        if (request.getStatus()
-                == com.braincampus.management.entity.SalaryPaymentStatus.PAID
-                && request.getPaymentDate() == null) {
-
+        if (request.getStatus() == com.braincampus.management.entity.SalaryPaymentStatus.PAID && request.getPaymentDate() == null) {
             throw new IllegalArgumentException(
                     "Payment date is required when salary is marked as PAID"
             );
@@ -79,8 +67,7 @@ public class SalaryPaymentService {
             );
         }
 
-        SalaryPayment payment =
-                SalaryPayment.builder()
+        SalaryPayment payment = SalaryPayment.builder()
                         .staff(staff)
                         .month(request.getMonth())
                         .year(request.getYear())
@@ -96,18 +83,13 @@ public class SalaryPaymentService {
                         )
                         .build();
 
-        payment =
-                salaryPaymentRepository.save(payment);
-
+        payment = salaryPaymentRepository.save(payment);
         return mapToResponse(payment);
     }
 
     @Transactional(readOnly = true)
     public List<SalaryPaymentResponse> getAll() {
-
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
+        Long tenantId = SecurityUtils.getCurrentTenantId();
         return salaryPaymentRepository
                 .findAllByTenantId(tenantId)
                 .stream()
@@ -141,15 +123,10 @@ public class SalaryPaymentService {
     }
 
     @Transactional(readOnly = true)
-    public List<SalaryPaymentResponse> getByStaff(
-            Long staffId
-    ) {
+    public List<SalaryPaymentResponse> getByStaff(Long staffId) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
-        staffRepository
-                .findByIdAndTenantId(
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+        staffRepository.findByIdAndTenantId(
                         staffId,
                         tenantId
                 )
@@ -177,9 +154,7 @@ public class SalaryPaymentService {
             Integer year
     ) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
+        Long tenantId = SecurityUtils.getCurrentTenantId();
         return salaryPaymentRepository
                 .findAllByMonthAndYearAndTenantId(
                         month,
@@ -195,9 +170,7 @@ public class SalaryPaymentService {
     @Transactional(readOnly = true)
     public List<SalaryPaymentResponse> getPending() {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
+        Long tenantId = SecurityUtils.getCurrentTenantId();
         return salaryPaymentRepository
                 .findAllByStatusAndTenantId(
                         com.braincampus.management.entity.SalaryPaymentStatus.PENDING,
@@ -230,8 +203,7 @@ public class SalaryPaymentService {
                                 )
                         );
 
-        Staff staff =
-                staffRepository
+        Staff staff = staffRepository
                         .findByIdAndTenantId(
                                 request.getStaffId(),
                                 tenantId
@@ -243,8 +215,7 @@ public class SalaryPaymentService {
                                 )
                         );
 
-        boolean duplicate =
-                salaryPaymentRepository
+        boolean duplicate = salaryPaymentRepository
                         .existsByStaffIdAndMonthAndYearAndTenantId(
                                 staff.getId(),
                                 request.getMonth(),
@@ -252,9 +223,7 @@ public class SalaryPaymentService {
                                 tenantId
                         );
 
-        if (duplicate
-                && !(
-                payment.getStaff().getId()
+        if (duplicate && !(payment.getStaff().getId()
                         .equals(staff.getId())
                         && payment.getMonth()
                         .equals(request.getMonth())
@@ -262,15 +231,10 @@ public class SalaryPaymentService {
                         .equals(request.getYear())
         )) {
 
-            throw new DuplicateResourceException(
-                    "Salary payment already exists for this staff member and month"
-            );
+            throw new DuplicateResourceException("Salary payment already exists for this staff member and month");
         }
 
-        if (request.getStatus()
-                == com.braincampus.management.entity.SalaryPaymentStatus.PAID
-                && request.getPaymentDate() == null) {
-
+        if (request.getStatus() == com.braincampus.management.entity.SalaryPaymentStatus.PAID && request.getPaymentDate() == null) {
             throw new IllegalArgumentException(
                     "Payment date is required when salary is marked as PAID"
             );
@@ -283,32 +247,23 @@ public class SalaryPaymentService {
         payment.setPaymentDate(request.getPaymentDate());
         payment.setStatus(request.getStatus());
         payment.setRemarks(request.getRemarks());
-
-        return mapToResponse(
-                salaryPaymentRepository.save(payment)
-        );
+        return mapToResponse(salaryPaymentRepository.save(payment));
     }
 
     public void delete(Long id) {
 
-        Long tenantId =
-                SecurityUtils.getCurrentTenantId();
-
-        SalaryPayment payment =
-                salaryPaymentRepository
+        Long tenantId = SecurityUtils.getCurrentTenantId();
+        SalaryPayment payment = salaryPaymentRepository
                         .findByIdAndTenantId(
                                 id,
                                 tenantId
                         )
                         .filter(p -> !p.getDeleted())
                         .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Salary payment not found"
-                                )
+                                new ResourceNotFoundException("Salary payment not found")
                         );
 
         payment.setDeleted(true);
-
         salaryPaymentRepository.save(payment);
     }
 
@@ -318,32 +273,22 @@ public class SalaryPaymentService {
 
         Staff staff = payment.getStaff();
 
-        return SalaryPaymentResponse.builder()
-                .id(payment.getId())
-
+        return SalaryPaymentResponse.builder().id(payment.getId())
                 .staffId(staff.getId())
                 .employeeCode(staff.getEmployeeCode())
                 .staffName(
-                        staff.getFirstName()
-                                + " "
-                                + (
-                                staff.getLastName() != null
-                                        ? staff.getLastName()
+                        staff.getFirstName() + " " + (staff.getLastName() != null
+                                ? staff.getLastName()
                                         : ""
                         )
                 )
 
                 .month(payment.getMonth())
                 .year(payment.getYear())
-
                 .amount(payment.getAmount())
-
                 .paymentDate(payment.getPaymentDate())
-
                 .status(payment.getStatus())
-
                 .remarks(payment.getRemarks())
-
                 .build();
     }
 }
