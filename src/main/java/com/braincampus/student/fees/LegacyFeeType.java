@@ -1,5 +1,5 @@
 package com.braincampus.student.fees;
-public enum FeeType {
+public enum LegacyFeeType {
 
     TUITION,
     EXAM,

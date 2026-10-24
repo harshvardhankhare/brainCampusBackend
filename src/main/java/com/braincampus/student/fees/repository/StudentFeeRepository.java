@@ -1,5 +1,5 @@
 package com.braincampus.student.fees.repository;
-import com.braincampus.student.fees.FeeType;
+import com.braincampus.student.fees.entity.FeeType;
 import com.braincampus.student.fees.entity.StudentFee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,11 +36,11 @@ public interface StudentFeeRepository
             Integer feeMonth
     );
 
-    boolean existsByTenantIdAndStudentIdAndAcademicYearAndFeeTypeAndFeeMonth(
+    boolean existsByTenantIdAndStudentIdAndAcademicYearAndFeeTypeIdAndFeeMonth(
             Long tenantId,
             Long studentId,
             String academicYear,
-            FeeType feeType,
+            Long feeTypeId,
             Integer feeMonth
     );
 
@@ -98,4 +98,5 @@ public interface StudentFeeRepository
             @Param("academicYear") String academicYear,
             @Param("classId") Long classId
     );
+    long countByTenantIdAndFeeTypeId(Long tenantId, Long feeTypeId);
 }
