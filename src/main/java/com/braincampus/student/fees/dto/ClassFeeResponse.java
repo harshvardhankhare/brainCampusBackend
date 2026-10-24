@@ -1,6 +1,4 @@
 package com.braincampus.student.fees.dto;
-
-import com.braincampus.student.fees.FeeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +16,7 @@ public class ClassFeeResponse {
     private String className;
     private String section;
     private String academicYear;
-    private FeeType feeType;
+    private String feeType;
     private Integer feeMonth;
     private BigDecimal amount;
     private Integer totalStudents;

@@ -2,7 +2,6 @@ package com.braincampus.student.fees.entity;
 import com.braincampus.auth.entity.Tenant;
 import com.braincampus.common.entity.BaseEntity;
 import com.braincampus.student.entity.Student;
-import com.braincampus.student.fees.FeeType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,9 +42,12 @@ public class StudentFee extends BaseEntity {
     @Column(name = "academic_year", nullable = false, length = 20)
     private String academicYear;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "fee_type", nullable = false, length = 30)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "fee_type_id", nullable = false)
     private FeeType feeType;
+
+    @Column(name = "fee_type_name", nullable = false, length = 60)
+    private String feeTypeName;
 
     @Column(name = "fee_month")
     private Integer feeMonth;
