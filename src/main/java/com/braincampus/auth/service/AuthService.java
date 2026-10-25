@@ -170,32 +170,20 @@ public class AuthService {
             );
         }
 
-
-        // 6. Create Admin User
         User user = new User();
 
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
-
-        // NEVER store plain password
-        user.setPassword(
-                passwordEncoder.encode(request.getPassword())
-        );
-
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEnabled(true);
         user.setAccountLocked(false);
         user.setAccountExpired(false);
         user.setCredentialsExpired(false);
-
         user.setTenant(tenant);
         user.setRole(adminRole);
-
         user = userRepository.save(user);
-
-
-        // 7. Return response
         return RegisterResponse.builder()
                 .userId(user.getId())
                 .schoolName(tenant.getSchoolName())

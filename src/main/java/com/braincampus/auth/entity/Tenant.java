@@ -1,9 +1,7 @@
 package com.braincampus.auth.entity;
-
 import com.braincampus.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
 @Entity
 @Table(name = "tenants")
 @Getter
