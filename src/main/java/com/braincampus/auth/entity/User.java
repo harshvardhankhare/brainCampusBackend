@@ -1,5 +1,4 @@
 package com.braincampus.auth.entity;
-
 import com.braincampus.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
