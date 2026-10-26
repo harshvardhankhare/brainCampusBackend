@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 public class PermissionResponse {
 
-    private PermissionType name;
+    private String name;
 
     private String description;
 }
