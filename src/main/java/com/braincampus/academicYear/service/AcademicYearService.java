@@ -1,5 +1,4 @@
 package com.braincampus.academicYear.service;
-
 import com.braincampus.academicYear.dto.AcademicYearRequest;
 import com.braincampus.academicYear.dto.AcademicYearResponse;
 import com.braincampus.academicYear.entity.AcademicYear;
@@ -10,7 +9,6 @@ import com.braincampus.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
