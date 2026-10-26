@@ -1,4 +1,6 @@
 package com.braincampus.management.controller;
+import com.braincampus.auth.entity.Permission;
+import com.braincampus.auth.repository.PermissionRepository;
 import com.braincampus.common.dto.ApiResponse;
 import com.braincampus.management.dto.PermissionResponse;
 import com.braincampus.management.dto.RolePermissionRequest;
@@ -17,6 +19,7 @@ import java.util.List;
 public class RolePermissionController {
 
     private final RolePermissionService rolePermissionService;
+    private final PermissionRepository permissionRepository;
     @PutMapping("/{roleId}/permissions")
     @PreAuthorize("hasAuthority('MANAGE_ROLE_PERMISSIONS')")
     public ResponseEntity<ApiResponse<Void>> updatePermissions(@PathVariable Long roleId, @Valid @RequestBody RolePermissionRequest request) {
@@ -68,6 +71,30 @@ public class RolePermissionController {
                         .success(true)
                         .message("Roles fetched successfully")
                         .data(response)
+                        .build()
+        );
+    }
+    @PostMapping("/permissions")
+    @PreAuthorize("hasAuthority('MANAGE_ROLE_PERMISSIONS')")
+    public ResponseEntity<ApiResponse<PermissionResponse>> createPermission(
+            @RequestBody PermissionResponse request) {
+        if (permissionRepository.findByName(request.getName()).isPresent()) {
+            throw new IllegalArgumentException("Permission already exists");
+        }
+        Permission newPerm = Permission.builder()
+                .name(request.getName().toUpperCase().trim())
+                .description(request.getDescription())
+                .build();
+        permissionRepository.save(newPerm);
+
+        return ResponseEntity.ok(
+                ApiResponse.<PermissionResponse>builder()
+                        .success(true)
+                        .message("Permission created successfully")
+                        .data(PermissionResponse.builder()
+                                .name(newPerm.getName())
+                                .description(newPerm.getDescription())
+                                .build())
                         .build()
         );
     }
