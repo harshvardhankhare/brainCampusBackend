@@ -1,5 +1,4 @@
 package com.braincampus.academicYear.controller;
-
 import com.braincampus.academicYear.dto.StudentEnrollmentRequest;
 import com.braincampus.academicYear.dto.StudentEnrollmentResponse;
 import com.braincampus.academicYear.service.StudentEnrollmentService;
