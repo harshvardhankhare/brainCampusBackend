@@ -1,8 +1,6 @@
 package com.braincampus.academicYear.repository;
-
 import com.braincampus.academicYear.entity.AcademicYear;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
 import java.util.Optional;
 
