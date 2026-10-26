@@ -1,5 +1,4 @@
 package com.braincampus.auth.service;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.SimpleMailMessage;

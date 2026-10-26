@@ -1,5 +1,4 @@
 package com.braincampus.academicYear.controller;
-
 import com.braincampus.academicYear.dto.AcademicYearRequest;
 import com.braincampus.academicYear.dto.AcademicYearResponse;
 import com.braincampus.academicYear.service.AcademicYearService;
@@ -10,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController

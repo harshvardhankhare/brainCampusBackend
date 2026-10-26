@@ -1,5 +1,4 @@
 package com.braincampus.academicYear.service;
-
 import com.braincampus.academicYear.dto.PromotionRequest;
 import com.braincampus.academicYear.dto.PromotionResponse;
 import com.braincampus.academicYear.entity.AcademicYear;

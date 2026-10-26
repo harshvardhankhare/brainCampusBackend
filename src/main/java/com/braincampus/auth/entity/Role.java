@@ -1,10 +1,8 @@
 package com.braincampus.auth.entity;
-
 import com.braincampus.common.entity.BaseEntity;
 import com.braincampus.common.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.HashSet;
 import java.util.Set;
 

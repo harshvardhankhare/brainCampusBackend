@@ -1,6 +1,4 @@
 package com.braincampus.management.dto;
-
-import com.braincampus.common.enums.PermissionType;
 import lombok.Builder;
 import lombok.Getter;
 import java.util.Set;
@@ -13,5 +11,5 @@ public class RolePermissionResponse {
 
     private String role;
 
-    private Set<PermissionType> permissions;
+    private Set<String> permissions;
 }
