@@ -6,6 +6,7 @@ import com.braincampus.management.dto.PermissionResponse;
 import com.braincampus.management.dto.RolePermissionRequest;
 import com.braincampus.management.dto.RolePermissionResponse;
 import com.braincampus.management.service.RolePermissionService;
+import com.braincampus.management.service.ProtectedRolePermissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.List;
 public class RolePermissionController {
 
     private final RolePermissionService rolePermissionService;
+    private final ProtectedRolePermissionService protectedRolePermissionService;
     private final PermissionRepository permissionRepository;
     @PutMapping("/{roleId}/permissions")
     @PreAuthorize("hasAuthority('MANAGE_ROLE_PERMISSIONS')")
@@ -86,6 +88,7 @@ public class RolePermissionController {
                 .description(request.getDescription())
                 .build();
         permissionRepository.save(newPerm);
+        protectedRolePermissionService.grantPermissionToProtectedRoles(newPerm);
 
         return ResponseEntity.ok(
                 ApiResponse.<PermissionResponse>builder()

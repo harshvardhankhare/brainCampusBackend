@@ -34,7 +34,7 @@ public class CustomUserDetails implements UserDetails {
         for (Permission permission : user.getRole().getPermissions()) {
             authorities.add(
                     new SimpleGrantedAuthority(
-                            permission.getName().name()
+                            permission.getName()
                     )
             );
         }
