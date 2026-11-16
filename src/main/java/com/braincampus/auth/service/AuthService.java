@@ -71,8 +71,7 @@ public class AuthService {
                 .getRole()
                 .getPermissions()
                 .stream()
-                .map(permission ->
-                        permission.getName().name())
+                .map(Permission::getName)
                 .collect(Collectors.toSet());
 
         LoginResponse response = LoginResponse.builder()
@@ -338,7 +337,7 @@ public class AuthService {
                         user.getRole()
                                 .getPermissions()
                                 .stream()
-                                .map(permission -> permission.getName().name())
+                                .map(Permission::getName)
                                 .collect(Collectors.toSet())
                 )
                 .build();

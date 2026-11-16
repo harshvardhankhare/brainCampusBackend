@@ -5,6 +5,7 @@ import com.braincampus.auth.repository.PermissionRepository;
 import com.braincampus.auth.repository.RoleRepository;
 import com.braincampus.common.enums.RoleType;
 import com.braincampus.exception.ResourceNotFoundException;
+import com.braincampus.exception.BadRequestException;
 import com.braincampus.management.dto.PermissionResponse;
 import com.braincampus.management.dto.RolePermissionResponse;
 import com.braincampus.management.dto.RolePermissionRequest;
@@ -34,8 +35,8 @@ public class RolePermissionService {
                 .filter(r -> !r.getDeleted())
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
 
-        if (role.getName() == RoleType.ADMIN) {
-            throw new IllegalArgumentException("ADMIN role permissions cannot be modified");
+        if (role.getName() == RoleType.ADMIN || role.getName() == RoleType.SUPER_ADMIN) {
+            throw new BadRequestException(role.getName() + " role permissions cannot be modified");
         }
 
         // Fetch permissions from DB by their string names
