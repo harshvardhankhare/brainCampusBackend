@@ -40,10 +40,12 @@ public class SchoolClassController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('VIEW_CLASS')")
-    public ResponseEntity<ApiResponse<List<SchoolClassResponse>>> getAll() {
+    public ResponseEntity<ApiResponse<List<SchoolClassResponse>>> getAll(
+            @RequestParam(required = false) String academicYear
+    ) {
 
         List<SchoolClassResponse> classes =
-                schoolClassService.getAll();
+                schoolClassService.getAll(academicYear);
 
         return ResponseEntity.ok(
                 ApiResponse.<List<SchoolClassResponse>>builder()
