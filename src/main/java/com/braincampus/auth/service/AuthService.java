@@ -4,6 +4,10 @@ import com.braincampus.auth.entity.*;
 import com.braincampus.auth.repository.*;
 import com.braincampus.exception.DuplicateResourceException;
 import com.braincampus.exception.UnauthorizedException;
+import com.braincampus.exception.BadRequestException;
+import com.braincampus.exception.ResourceNotFoundException;
+import com.braincampus.student.entity.Student;
+import com.braincampus.student.repository.StudentRepository;
 import com.braincampus.security.jwt.JwtService;
 import com.braincampus.security.userDetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +36,7 @@ public class AuthService {
     private final PermissionRepository permissionRepository;
     private final PasswordResetOtpRepository passwordResetOtpRepository;
     private final EmailService emailService;
+    private final StudentRepository studentRepository;
 
     public LoginResult login(LoginRequest request) {
 
@@ -192,6 +197,54 @@ public class AuthService {
                 .email(user.getEmail())
                 .role(adminRole.getName().name())
                 .message("School and admin account registered successfully")
+                .build();
+    }
+
+    public RegisterResponse registerStudent(StudentRegisterRequest request) {
+        Tenant tenant = tenantRepository.findBySchoolCode(request.getSchoolCode())
+                .filter(t -> Boolean.TRUE.equals(t.getActive()))
+                .orElseThrow(() -> new ResourceNotFoundException("School code is invalid or inactive"));
+
+        String email = request.getEmail().trim();
+        Student student = studentRepository.findFirstByTenant_IdAndEmailIgnoreCaseAndActiveTrue(tenant.getId(), email)
+                .orElseThrow(() -> new BadRequestException("Email does not match an active student record"));
+
+        if (userRepository.existsByEmailAndTenant_SchoolCode(email, request.getSchoolCode())) {
+            throw new DuplicateResourceException("Email already registered for this school");
+        }
+
+        Role role = roleRepository.findByTenant_IdAndName(tenant.getId(), RoleType.STUDENT)
+                .orElseGet(() -> {
+                    Role newRole = new Role();
+                    newRole.setName(RoleType.STUDENT);
+                    newRole.setDescription("Student");
+                    newRole.setTenant(tenant);
+                    return roleRepository.save(newRole);
+                });
+
+        User user = new User();
+        user.setFirstName(student.getFirstName());
+        user.setLastName(student.getLastName());
+        user.setEmail(email.toLowerCase());
+        user.setPhone(student.getPhone());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEnabled(true);
+        user.setAccountLocked(false);
+        user.setAccountExpired(false);
+        user.setCredentialsExpired(false);
+        user.setTenant(tenant);
+        user.setRole(role);
+        user = userRepository.save(user);
+
+        return RegisterResponse.builder()
+                .userId(user.getId())
+                .schoolName(tenant.getSchoolName())
+                .schoolCode(tenant.getSchoolCode())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .role(role.getName().name())
+                .message("Account registered successfully")
                 .build();
     }
     public void resetPassword(

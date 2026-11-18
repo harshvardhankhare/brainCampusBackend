@@ -55,4 +55,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             @Param("classId") Long classId
     );
     List<Student> findAllByTenantId(Long tenantId);
+    Optional<Student> findFirstByTenant_IdAndEmailIgnoreCaseAndActiveTrue(Long tenantId, String email);
+    Optional<Student> findFirstByTenant_IdAndPhoneAndActiveTrue(Long tenantId, String phone);
+    Optional<Student> findFirstByTenant_IdAndParentPhoneAndActiveTrue(Long tenantId, String parentPhone);
 }

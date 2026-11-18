@@ -74,6 +74,20 @@ public class AuthController {
                                 .build()
                 );
     }
+
+    @PostMapping("/student-register")
+    public ResponseEntity<ApiResponse<RegisterResponse>> registerStudent(
+            @Valid @RequestBody StudentRegisterRequest request
+    ) {
+        RegisterResponse registered = authService.registerStudent(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.<RegisterResponse>builder()
+                        .success(true)
+                        .message("Registration successful")
+                        .data(registered)
+                        .build()
+        );
+    }
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser() {
 
