@@ -10,6 +10,11 @@ public interface SchoolClassRepository extends JpaRepository<SchoolClass, Long> 
 
     List<SchoolClass> findAllByTenantId(Long tenantId);
 
+    List<SchoolClass> findAllByAcademicYearAndTenantId(
+            String academicYear,
+            Long tenantId
+    );
+
     Optional<SchoolClass> findByIdAndTenantId(
             Long id,
             Long tenantId

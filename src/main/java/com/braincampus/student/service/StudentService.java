@@ -1,6 +1,8 @@
 package com.braincampus.student.service;
 import com.braincampus.exception.DuplicateResourceException;
 import com.braincampus.exception.ResourceNotFoundException;
+import com.braincampus.academicYear.entity.StudentEnrollment;
+import com.braincampus.academicYear.repository.StudentEnrollmentRepository;
 import com.braincampus.security.SecurityUtils;
 import com.braincampus.student.dto.PageResponse;
 import com.braincampus.student.dto.StudentRequest;
@@ -21,6 +23,7 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final SchoolClassRepository schoolClassRepository;
+    private final StudentEnrollmentRepository enrollmentRepository;
 
     public StudentResponse create(StudentRequest request) {
 
@@ -76,25 +79,33 @@ public class StudentService {
     ) {
         Long tenantId = SecurityUtils.getCurrentTenantId();
 
-        Page<Student> studentPage;
-
         if (classId != null || academicYear != null) {
-            studentPage = studentRepository.findStudentsWithFilter(
+            Page<StudentEnrollment> enrollmentPage = enrollmentRepository.findAllByFilters(
                     tenantId,
                     classId,
                     academicYear,
                     pageable
             );
-        } else {
-            studentPage = studentRepository.findAllByTenantId(tenantId, pageable);
+            Page<StudentResponse> responsePage = enrollmentPage.map(
+                    enrollment -> mapToResponse(enrollment.getStudent(), enrollment)
+            );
+            return PageResponse.from(responsePage);
         }
 
+        Page<Student> studentPage = studentRepository.findAllByTenantId(tenantId, pageable);
         Page<StudentResponse> responsePage = studentPage.map(this::mapToResponse);
 
         return PageResponse.from(responsePage);
     }
 
     private StudentResponse mapToResponse(Student student) {
+        return mapToResponse(student, null);
+    }
+
+    private StudentResponse mapToResponse(Student student, StudentEnrollment enrollment) {
+        SchoolClass schoolClass = enrollment == null
+                ? student.getSchoolClass()
+                : enrollment.getSchoolClass();
         return StudentResponse.builder()
                 .id(student.getId())
                 .roleNumber(student.getRoleNumber())
@@ -108,10 +119,12 @@ public class StudentService {
                 .parentPhone(student.getParentPhone())
                 .active(student.getActive())
                 .schoolCode(student.getTenant().getSchoolCode())
-                .classId(student.getSchoolClass().getId())
-                .className(student.getSchoolClass().getName())
-                .section(student.getSchoolClass().getSection())
-                .academicYear(student.getSchoolClass().getAcademicYear())
+                .classId(schoolClass.getId())
+                .className(schoolClass.getName())
+                .section(schoolClass.getSection())
+                .academicYear(enrollment == null
+                        ? schoolClass.getAcademicYear()
+                        : enrollment.getAcademicYear().getName())
                 .build();
     }
 

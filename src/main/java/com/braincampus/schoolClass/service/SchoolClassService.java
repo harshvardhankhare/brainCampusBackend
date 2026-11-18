@@ -55,12 +55,18 @@ public class SchoolClassService {
     }
 
     @Transactional(readOnly = true)
-    public List<SchoolClassResponse> getAll() {
+    public List<SchoolClassResponse> getAll(String academicYear) {
 
         Tenant tenant = getCurrentTenant();
 
-        return schoolClassRepository
-                .findAllByTenantId(tenant.getId())
+        List<SchoolClass> classes = academicYear == null || academicYear.isBlank()
+                ? schoolClassRepository.findAllByTenantId(tenant.getId())
+                : schoolClassRepository.findAllByAcademicYearAndTenantId(
+                        academicYear,
+                        tenant.getId()
+                );
+
+        return classes
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
